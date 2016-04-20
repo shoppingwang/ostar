@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:property-placeholder location="classpath:config.properties"/>
+
+    <import resource="analysis-dubbo.xml"/>
+
+    <!-- 页面标签权限功能依赖 -->
+    <bean id="webInvocationFilter" class="org.springframework.security.web.access.DefaultWebInvocationPrivilegeEvaluator">
+        <constructor-arg ref="customSecurityFilter"/>
+    </bean>
+
+    <security:http pattern="/**/*.css" security="none"/>
+    <security:http pattern="/**/*.js" security="none"/>
+    <security:http pattern="/**/*.jpg" security="none"/>
+    <security:http pattern="/**/*.gif" security="none"/>
+    <security:http pattern="/**/*.png" security="none"/>
+    <security:http pattern="/favicon.ico" security="none"/>
+    <security:http pattern="/login.jsp" security="none"/>
+
+    <security:http use-expressions="true" entry-point-ref="authenticationProcessingFilterEntryPoint">
+        <security:csrf disabled="true"/>
+
+        <!-- 登陆页面设置
+        <security:form-login login-page="/login.jsp" default-target-url="/"/>
+        -->
+
+        <!-- max-sessions="1" 其中1表示一个帐号可同时登录的次数  -->
+        <security:session-management>
+            <security:concurrency-control max-sessions="1"/>
+        </security:session-management>
+
+        <!-- 检测失效的sessionId,session超时时，定位到另外一个URL -->
+        <security:session-management invalid-session-url="/"/>
+
+        <!-- 配置登出信息，指定退出系统后，跳转页面 -->
+        <security:logout logout-success-url="/" invalidate-session="true"/>
+
+        <!-- 认证和授权 -->
+        <security:custom-filter ref="customUsernamePasswordAuthenticationFilter" position="FORM_LOGIN_FILTER"/>
+        <security:custom-filter ref="customSecurityFilter" before="FILTER_SECURITY_INTERCEPTOR"/>
+    </security:http>
+
+    <!-- 登录验证器 -->
+    <bean id="customUsernamePasswordAuthenticationFilter"
+          class="com.gochinatv.cdn.analysis.security.CustomUsernamePasswordAuthenticationFilter">
+        <!-- 处理登录 -->
+        <property name="filterProcessesUrl" value="/login"/>
+        <property name="usernameParameter" value="username"/>
+        <property name="passwordParameter" value="password"/>
+        <property name="authenticationSuccessHandler" ref="loginAuthenticationSuccessHandler"/>
+        <property name="authenticationFailureHandler" ref="simpleUrlAuthenticationFailureHandler"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+    </bean>
+
+    <bean id="loginAuthenticationSuccessHandler"
+          class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+        <property name="defaultTargetUrl" value="/"/>
+    </bean>
+
+    <bean id="simpleUrlAuthenticationFailureHandler"
+          class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+        <property name="defaultFailureUrl" value="/login.jsp"/>
+    </bean>
+
+    <!-- 认证过滤器 -->
+    <bean id="customSecurityFilter" class="com.gochinatv.cdn.analysis.filter.security.CustomSecurityFilter">
+        <!-- 用户拥有的权限 -->
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <!-- 用户是否拥有所请求资源的权限 -->
+        <property name="accessDecisionManager" ref="customAccessDecisionManager"/>
+        <!-- 资源与权限对应关系 -->
+        <property name="securityMetadataSource" ref="customFilterInvocationSecurityMetadataSource"/>
+    </bean>
+
+    <bean id="customAccessDecisionManager" class="com.gochinatv.cdn.analysis.security.CustomAccessDecisionManager"/>
+
+    <bean id="customFilterInvocationSecurityMetadataSource"
+          class="com.gochinatv.cdn.analysis.filter.security.CustomFilterInvocationSecurityMetadataSource">
+        <constructor-arg name="rolePathConfigService" ref="rolePathConfigService"/>
+        <constructor-arg name="moduleCode" value="${module.code}"/>
+    </bean>
+
+    <!-- 用户登陆信息 -->
+    <bean name="userDetailsService" class="com.gochinatv.cdn.analysis.security.CustomUserDetailsService">
+        <property name="systemUserService" ref="systemUserService"/>
+        <property name="systemRoleService" ref="systemRoleService"/>
+    </bean>
+
+    <bean name="bcryptEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="userDetailsService">
+            <security:password-encoder ref="bcryptEncoder"/>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <!-- 未登录的切入点 -->
+    <bean id="authenticationProcessingFilterEntryPoint"
+          class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <constructor-arg value="/login.jsp"/>
+    </bean>
+</beans>

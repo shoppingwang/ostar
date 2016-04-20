@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <dubbo:application name="dubbo-analysis-web-consumer" owner="gochinatv-cdn" organization="gochinatv"/>
+
+    <dubbo:registry address="${dubbo.registry.address}"/>
+
+    <dubbo:consumer check="false" filter="webUserInfoAcquireFilter"/>
+
+    <dubbo:reference id="systemUserService" interface="com.gochinatv.cdn.service.security.SystemUserService"/>
+
+    <dubbo:reference id="systemRoleService" interface="com.gochinatv.cdn.service.security.SystemRoleService"/>
+
+    <dubbo:reference id="rolePathConfigService" interface="com.gochinatv.cdn.service.security.RolePathConfigService"/>
+</beans>
