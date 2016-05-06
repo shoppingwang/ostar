@@ -10,6 +10,9 @@
 * 在模块ostar-security\src\main\resources\config.properties文件中配置连接用户权限库的数据库、Zookeeper服务注册中心地址/端口号
 * 在模块ostar-analysis\src\main\resources\config.properties文件中配置连接分析库的数据库、Zookeeper服务注册中心地址/端口号
 * 在模块ostar-analysis-web\src\main\resources\config.properties文件配置Zookeeper服务注册中心地址/端口号
+```js
+各模块的数据库及PDM文件存放在模块的doc目录下
+```
 
 ###部署步骤
 * 安装IDE开发工具，必须支持Maven工程文件导入，例如IngelliJ IDEA或者Eclipse，建议IngelliJ IDEA
@@ -25,7 +28,7 @@ https://github.com/dangdangdotcom/dubbox
 将服务模块ostar-analysis/target/ostar-analysis-1.0-SNAPSHOT.war文件拷贝至apache-tomcat-7.0.67/webapps目录下，并更名为ROOT.war
 将服务模块ostar-security/target/ostar-security-1.0-SNAPSHOT.war文件拷贝至apache-tomcat-7.0.67/webapps目录下，并更名为ROOT.war
 ```
-* 启动Tomcat，访问http://IP:8080
+* 启动各模块Tomcat服务，访问Web模块的对应http地址，例如http://IP:8080
 ```js
     示例登陆用户admin/admin具有管理员权限，wxp/wxp具有普通权限
 ```
