@@ -2,7 +2,7 @@
 ----
 ###部署条件
 * 安装JDK7或以上版本
-* 安装Tomcat7或以版本
+* 安装Tomcat7或以上版本
 * 安装Zookeeper3.4.6
 
 ###配置步骤
@@ -30,7 +30,7 @@ https://github.com/dangdangdotcom/dubbox
 ```
 * 启动各模块Tomcat服务，访问Web模块的对应http地址，例如http://IP:8080
 ```js
-    示例登陆用户admin/admin具有管理员权限，wxp/wxp具有普通权限
+示例登陆用户admin/admin具有管理员权限，wxp/wxp具有普通权限
 ```
     
 ###模块介绍
