@@ -8,7 +8,7 @@
     </appender>
 
     <appender name="ostarAnalysisFileAppender" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="/data/log/ostar-analysis/ostar-analysis.log"/>
+        <param name="File" value="log/ostar-analysis/ostar-analysis.log"/>
         <param name="Append" value="true"/>
         <param name="MaxBackupIndex" value="10"/>
         <layout class="org.apache.log4j.PatternLayout">
